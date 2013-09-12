@@ -1,0 +1,147 @@
+\documentclass[twoside]{article}
+\usepackage{bnf}
+\usepackage{fullpage}
+\usepackage{verbatim}
+
+\begin{document}
+Based on\\ \small{http://groups.csail.mit.edu/graphics/classes/6.837/F04/assignments/assignment1/grammar.html}; last retreived September 2013.
+
+\begin{grammar}
+	[(colon) {::$\Rightarrow$}]
+	[(period) {\rule{1ex}{1ex}}]
+	[(semicolon) {$|$}]
+file: camera viewPlane lights background materials group.
+
+camera: orthographicCamera ; perspectiveCamera ; simplePerspectiveCamera
+
+orthographicCamera: "\verb!OrthographicCamera {!"\\
+    "\verb!center!" Vec3f\\
+    "\verb!direction!" Vec3f\\
+    "\verb!up!" Vec3f\\
+    %"\verb!width!" float\\
+    %"\verb!height!" float\\
+"\verb!}!".
+
+perspectiveCamera: "\verb!PerspectiveCamera {!"\\
+    "\verb!center!" Vec3f\\
+    "\verb!direction!" Vec3f\\
+    "\verb!up!" Vec3f\\
+    "\verb!angle!" float\\
+"\verb!}!".
+
+simplePerspectiveCamera: "\verb!SimplePerspectiveCamera {!"\\
+    "\verb!center!" Vec3f\\
+    "\verb!direction!" Vec3f\\
+    "\verb!up!" Vec3f\\
+    "\verb!distance!" float\\
+"\verb!}!".
+
+viewPlane: "\verb!ViewPlane {!"\\
+    "\verb!width!" int\\
+    "\verb!height!" int\\
+    "\verb!pixelsize!" float\\
+"\verb!}!".
+
+lights: "\verb!Lights {!"\\
+    "\verb!numLights!" int\\
+%    "\verb!light!" \verb!{!numLights\verb!}!\\
+    "\verb!light!" light\\
+"\verb!}!".
+
+light: directionalLight ; pointLight ; \O
+
+directionalLight: "\verb!DirectionalLight {!"\\
+    "\verb!position!" Vec3f\\
+    "\verb!direction!" Vec3f\\
+    "\verb!color!" Vec3f\\
+    ("\verb!angle!" float )\\
+    ( "\verb!attenuation!"  float float float )+\\
+"\verb!}!".
+
+pointLight: "\verb!PointLight {!"\\
+    "\verb!position!" Vec3f\\
+    "\verb!color!" Vec3f\\
+    ( "\verb!attenuation!"  float float float )+\\
+"\verb!}!".
+
+background: "\verb!Background {!"\\
+    "\verb!color!" Vec3f\\
+"\verb!}!".
+
+materials: "\verb!Materials {!"\\
+    "\verb!numMaterials!" int\\
+%    "\verb!material!" \verb!{!numMaterials\verb!}!\\
+    "\verb!material!" material\\
+"\verb!}!".
+
+material: phongMaterial
+
+phongMaterial: "\verb!PhongMaterial {!"\\
+    "\verb!diffuseColor!" Vec3f\\
+    ( "\verb!specularColor!"  Vec3f )+\\
+    ( "\verb!exponent!"  float )+\\
+    ( "\verb!transparentColor!"  Vec3f )+\\
+    ( "\verb!reflextiveColor!"  Vec3f )+\\
+    ( "\verb!indexOfRefreaction!"  float )+\\
+"\verb!}!".
+
+group: "\verb!Group {!"\\
+    "\verb!numObjects!" int\\
+    (object3D ; materialIndex object3D)\verb!{!\\
+"\verb!}!".
+
+object3D: group ; transform ; sphere ; plane ; triangle ; triangleMesh
+
+transform: "\verb!Transform {!"\\
+    ( transformation )*\\
+    object3D\\
+"\verb!}!".
+
+transformation: "\verb!Translate!" { Vec3f } ;\\
+  "\verb!Scale!" { Vec3f } ;\\
+  "\verb!XRotate!" { float } ;\\
+  "\verb!YRotate!" { float } ;\\
+  "\verb!ZRotate!" { float } ;\\
+  "\verb!Rotate!" { float Vec3f } ;\\
+  "\verb!Matrix!" { Matrix16f }.
+
+sphere: "\verb!Sphere {!"\\
+    "\verb!center!" Vec3f\\
+    "\verb!radius!" float\\
+"\verb!}!".
+
+plane: "\verb!Plane {!"\\
+  "\verb!normal!" Vec3f\\
+  "\verb!offset!" float\\
+"\verb!}!".
+
+triangle: "\verb!Triangle {!"\\
+  "\verb!vertex0!" Vec3f\\
+  "\verb!vertex1!" Vec3f\\
+  "\verb!vertex2!" Vec3f\\
+"\verb!}!".
+
+triangleMesh: "\verb!TriangleMesh {!"\\
+  "\verb!ply_file!" string\\
+"\verb!}!".
+
+materialIndex: "\verb!MaterialIndex!" int.
+
+Vec3f: float float float.
+
+Matrix16f: float float float float float float float float float float float float float float float float.
+
+int: [-]?[1-9]+[0-9]*.
+
+float: [-]?[0-9]+"\verb!.!"[0-9]*.
+
+string: [\verb!#-}!]*.
+
+\end{grammar}
+\vfill
+\tiny
+\begin{verbatim}
+$Id: grammar.tex 4420 2013-09-12 04:18:08Z mshafae $
+\end{verbatim}
+
+\end{document}

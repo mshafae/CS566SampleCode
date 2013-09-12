@@ -1,0 +1,133 @@
+<!--Retrieved on September 11, 2013 from http://groups.csail.mit.edu/graphics/classes/6.837/F04/assignments/assignment1/grammar.html -->
+<h1>6.837 Intro to Computer Graphics, Fall 2003<br>
+Assignment 1: Ray Casting</h1>
+<h3>Scene description file grammar</h3>
+
+<p>
+
+<table border = 0 cellspacing = 0 cellpadding = 7>
+
+<tr>
+<td valign=top align=right><tt><b>file</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top><tt><b>camera</b>  <b>background</b>  <b>materials</b>  <b>group</b></td>
+</tr>
+
+<tr>
+<td valign=top align = right><tt><b>camera</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top><tt><b>orthographicCamera</b> </td>
+</tr>
+
+<tr>
+<td valign=top align = right><tt><b>orthographicCamera</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top>
+<tt>OrthographicCamera { <br>
+&nbsp; &nbsp; center <b>Vec3f</b><br>
+&nbsp; &nbsp; direction <b>Vec3f</b><br>
+&nbsp; &nbsp; up <b>Vec3f</b><br>
+&nbsp; &nbsp; size <b>float</b> <br>
+}
+</tt></td>
+</tr>
+
+<tr>
+<td valign=top align = right><tt><b>background</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top>
+<tt>Background { <br>
+&nbsp; &nbsp; color <b>Vec3f</b><br>
+}
+</td>
+</tr>
+
+<tr>
+<td valign=top align = right><tt><b>materials</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top>
+<tt>Materials { <br>
+&nbsp; &nbsp; numMaterials <b>int</b><br>
+&nbsp; &nbsp; <b>Material</b> </tt><em> ^ numMaterials</em><tt><br>
+}
+</td>
+</tr>
+
+
+<tr>
+<td valign=top align = right><tt><b>Material</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top>
+<tt>Material { <br>
+&nbsp; &nbsp; diffuseColor <b>Vec3f</b><br>
+}
+</td>
+</tr>
+
+
+<tr>
+<td valign=top align = right><tt><b>group</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top>
+<tt>Group { <br>
+&nbsp; &nbsp; numObjects <b>int</b><br>
+&nbsp; &nbsp; (<b>object3D</b>  |  <b>materialIndex</b>  <b>object3D</b>)</tt><em> ^ numObjects</em><tt><br>
+}
+</td>
+</tr>
+
+<tr>
+<td valign=top align=right><tt><b>object3D</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top><tt><b>group</b>  |  <b>sphere</b> </td>
+</tr>
+
+<tr>
+<td valign=top align = right><tt><b>sphere</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top><tt>
+Sphere { <br>
+&nbsp; &nbsp; center <b>Vec3f</b><br>
+&nbsp; &nbsp; radius <b>float</b><br>
+}
+</td>
+</tr>
+
+<tr>
+<td valign=top align = right><tt><b>materialIndex</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top><tt>
+MaterialIndex <b>int</b> 
+</td>
+</tr>
+
+<tr>
+<td valign=top align=right><tt><b>Vec3f</b></td>
+<td valign=top><tt>::=</td>
+<td valign=top><tt><b>float</b>  <b>float</b>  <b>float</b></td>
+</tr>
+
+</table>
+
+
+<h3>How to read a grammar:</h3>
+
+Start with the top level rule, in this case <tt><b>file</b></tt>.  To expand
+a rule, substitute the appropriate definitions for each of the
+elements in bold.  Some special notation:
+
+<p>
+
+<table border = 0 cellspacing = 0 cellpadding = 5>
+
+<tr>
+<td align = right><tt>|</tt></td>
+<td>means "OR"</td>
+</tr>
+
+<tr>
+<td align = right> <em>^ n</em></td>
+<td>means "exactly <em>n</em> elements"</td>
+</tr>
+
+</table>
