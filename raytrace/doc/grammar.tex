@@ -7,31 +7,31 @@
 Based on\\ \small{http://groups.csail.mit.edu/graphics/classes/6.837/F04/assignments/assignment1/grammar.html}; last retreived September 2013.
 
 \begin{grammar}
-	[(colon) {::$\Rightarrow$}]
-	[(period) {\rule{1ex}{1ex}}]
-	[(semicolon) {$|$}]
+  [(colon) {::$\Rightarrow$}]
+  [(period) {\rule{1ex}{1ex}}]
+  [(semicolon) {$|$}]
 file: camera viewPlane lights background materials group.
 
 camera: orthographicCamera ; perspectiveCamera ; simplePerspectiveCamera
 
 orthographicCamera: "\verb!OrthographicCamera {!"\\
-    "\verb!center!" Vec3f\\
-    "\verb!direction!" Vec3f\\
+    "\verb!position!" Vec3f\\
+    "\verb!lookAt!" Vec3f\\
     "\verb!up!" Vec3f\\
-    %"\verb!width!" float\\
-    %"\verb!height!" float\\
+%    "\verb!width!" float\\
+ %   "\verb!height!" float\\
 "\verb!}!".
 
 perspectiveCamera: "\verb!PerspectiveCamera {!"\\
-    "\verb!center!" Vec3f\\
-    "\verb!direction!" Vec3f\\
+    "\verb!position!" Vec3f\\
+    "\verb!lookAt!" Vec3f\\
     "\verb!up!" Vec3f\\
-    "\verb!angle!" float\\
+    "\verb!angleInYDirection!" float\\
 "\verb!}!".
 
 simplePerspectiveCamera: "\verb!SimplePerspectiveCamera {!"\\
     "\verb!center!" Vec3f\\
-    "\verb!direction!" Vec3f\\
+    "\verb!lookAt!" Vec3f\\
     "\verb!up!" Vec3f\\
     "\verb!distance!" float\\
 "\verb!}!".
@@ -40,6 +40,7 @@ viewPlane: "\verb!ViewPlane {!"\\
     "\verb!width!" int\\
     "\verb!height!" int\\
     "\verb!pixelsize!" float\\
+    "\verb!sampleCount!" int\\
 "\verb!}!".
 
 lights: "\verb!Lights {!"\\
@@ -55,7 +56,7 @@ directionalLight: "\verb!DirectionalLight {!"\\
     "\verb!direction!" Vec3f\\
     "\verb!color!" Vec3f\\
     ("\verb!angle!" float )\\
-    ( "\verb!attenuation!"  float float float )+\\
+    ( "\verb!attenuation!"  float float float )\\
 "\verb!}!".
 
 pointLight: "\verb!PointLight {!"\\
@@ -77,12 +78,11 @@ materials: "\verb!Materials {!"\\
 material: phongMaterial
 
 phongMaterial: "\verb!PhongMaterial {!"\\
-    "\verb!diffuseColor!" Vec3f\\
-    ( "\verb!specularColor!"  Vec3f )+\\
-    ( "\verb!exponent!"  float )+\\
-    ( "\verb!transparentColor!"  Vec3f )+\\
-    ( "\verb!reflextiveColor!"  Vec3f )+\\
-    ( "\verb!indexOfRefreaction!"  float )+\\
+    "\verb!ambientColor!" Vec4f\\
+    "\verb!diffuseColor!" Vec4f\\
+    "\verb!specularColor!" Vec4f\\
+    "\verb!shininess!" float\\
+    ( "\verb!indexOfRefraction!"  float )?\\
 "\verb!}!".
 
 group: "\verb!Group {!"\\
@@ -141,7 +141,7 @@ string: [\verb!#-}!]*.
 \vfill
 \tiny
 \begin{verbatim}
-$Id: grammar.tex 4420 2013-09-12 04:18:08Z mshafae $
+$Id: grammar.tex 5816 2015-05-25 09:16:10Z mshafae $
 \end{verbatim}
 
 \end{document}

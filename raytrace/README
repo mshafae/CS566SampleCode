@@ -1,9 +1,26 @@
 raytrace -- a simple raytracing harness for CSUF's computer graphics course
 
-Copyright (c) 2005-2013 Michael Shafae
+Copyright (c) 2005-2015 Michael Shafae
 All rights reserved.
 
 Overview
 --------
 
-raytrace is a unimaginitive name for a raytracing harness. It's used in CSUF's computer graphics course to help students get started. See COPYING for license terms.
+raytrace is a unimaginitive name for a raytracing harness. It's used in
+CSU Fullerton's computer graphics course to help students get started.
+See COPYING for license terms.
+
+To build the software, you'll need GNU Make and BASH. BASH is needed to
+run config/config.guess. Platform specific makefiles are located
+in config.
+
+This project requires GFXMath.h. This is an exercise that students complete
+in CPSC 484 -- Principles of Computer Graphics. The starting point for
+this header-only library is
+<https://github.com/mshafae/CS484SampleCode/tree/master/GFXMath>.
+
+This project uses FreeImage to write bitmaps. If your installation does
+not already have this library installed, you can find pre-built binaries
+at <https://gamble.ecs.fullerton.edu/resources>. If you use a
+Debian-style GNU/Linux environment, scripts for installing the required
+packages are available on the aforementioned page.
