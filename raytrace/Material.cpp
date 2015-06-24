@@ -26,63 +26,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * $Id: Camera.h 5856 2015-06-06 22:48:38Z mshafae $
+ * $Id: Material.cpp 5851 2015-06-03 09:11:39Z mshafae $
  *
  */
 
-#include <iostream>
+#include "Material.h"
 
-#include <GFXMath.h>
-#include <GFXExtra.h>
-
-#ifndef _CAMERA_H_
-#define _CAMERA_H_
-
-enum{
-  CAMERA_NULL = 0,
-  CAMERA_ORTHO,
-  CAMERA_SIMPLE_PERSPECTIVE,
-  CAMERA_PERSPECTIVE
-};
-
-class Camera{
-public:
-  Camera( ): _type(CAMERA_NULL){ };
-  Camera(uint type, Point3& position, Point3& lookAt, Vec3& up);
-  Camera(const Camera& c);
-
-  virtual ~Camera( ){ };
-
-  virtual Camera& operator =(const Camera& rhs);
-  
-  Point3 position( ) const;
-  Point3 lookAt( ) const;
-  Vec3 gaze( ) const;
-  Vec3 up( ) const;
-  Vec3 right( ) const;
-
-  Mat4 lookAtMatrix( ) const;
-    
-  uint type( ) const { return _type; };
-
-  std::ostream& write(std::ostream &out) const;
-  
-protected :
-  Point3 _position;
-  Point3 _lookAt;
-  Vec3 _up;
-  uint _type;  
-};
-
-// Basic I/O
-std::ostream& operator <<( std::ostream &out, const Camera &c );
-
-class OrthographicCamera : public Camera{
-public:
-  OrthographicCamera(Point3& position, Point3& lookAt, Vec3& up);
-  ~OrthographicCamera( );
-  
-  OrthographicCamera& operator =(const OrthographicCamera& rhs);  
-};
-
-#endif
+std::ostream& operator <<( std::ostream &out, const Material &m ){
+  return m.write(out);
+}

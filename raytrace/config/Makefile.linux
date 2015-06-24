@@ -1,0 +1,20 @@
+#
+# Configuration for Linux
+#
+# $Id: Makefile.freebsd 4759 2014-01-23 07:42:48Z mshafae $
+#
+# If you have all the neccessary packages, this should 'just work'.
+#
+# OPENGL_KIT_HOME must point to the root directory where the include and lib
+# directory can be found for the project's dependencies.
+#
+# An archive of the kit used for this project can be found at
+# <https://gamble.ecs.fullerton.edu/resources> as
+# <http://delaunay.ecs.fullerton.edu/~mshafae/srl/opengl_kit_osx.zip>.
+# This archive was unpacked and the contents copied to ${HOME}/local
+#
+#OPENGL_KIT_HOME = ${HOME}/local/TitanOpenGLKit
+CFLAGS += -g -std=c++11 -Wall -pedantic -pipe -I . -I /opt/local/include -I ${HOME}/local/include
+LDFLAGS += -g -Wall -pipe -L /opt/local/lib
+LLDLIBS += -lpthread -lfreeimageplus
+

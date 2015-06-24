@@ -26,63 +26,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * $Id: Camera.h 5856 2015-06-06 22:48:38Z mshafae $
+ * $Id: Camera.cpp 5856 2015-06-06 22:48:38Z mshafae $
  *
  */
 
-#include <iostream>
+#include "Camera.h"
 
-#include <GFXMath.h>
-#include <GFXExtra.h>
+std::ostream& Camera::write(std::ostream &out) const{
+  out << "Camera(" << type( ) << "):" << std::endl;
+  out << "\teye position: ";
+  _position.write_row(out) << std::endl;
+  out << "\tlookAt: ";
+  _lookAt.write_row(out) << std::endl;
+  out << "\tgaze direction: ";
+  gaze( ).write_row(out) << std::endl;
+  out << "\tup direction: ";
+  _up.write_row(out) << std::endl;
+  out << "\tright direction: ";
+  right( ).write_row(out) << std::endl;
+  return(out);
+}
 
-#ifndef _CAMERA_H_
-#define _CAMERA_H_
-
-enum{
-  CAMERA_NULL = 0,
-  CAMERA_ORTHO,
-  CAMERA_SIMPLE_PERSPECTIVE,
-  CAMERA_PERSPECTIVE
-};
-
-class Camera{
-public:
-  Camera( ): _type(CAMERA_NULL){ };
-  Camera(uint type, Point3& position, Point3& lookAt, Vec3& up);
-  Camera(const Camera& c);
-
-  virtual ~Camera( ){ };
-
-  virtual Camera& operator =(const Camera& rhs);
-  
-  Point3 position( ) const;
-  Point3 lookAt( ) const;
-  Vec3 gaze( ) const;
-  Vec3 up( ) const;
-  Vec3 right( ) const;
-
-  Mat4 lookAtMatrix( ) const;
-    
-  uint type( ) const { return _type; };
-
-  std::ostream& write(std::ostream &out) const;
-  
-protected :
-  Point3 _position;
-  Point3 _lookAt;
-  Vec3 _up;
-  uint _type;  
-};
-
-// Basic I/O
-std::ostream& operator <<( std::ostream &out, const Camera &c );
-
-class OrthographicCamera : public Camera{
-public:
-  OrthographicCamera(Point3& position, Point3& lookAt, Vec3& up);
-  ~OrthographicCamera( );
-  
-  OrthographicCamera& operator =(const OrthographicCamera& rhs);  
-};
-
-#endif
+std::ostream& operator <<( std::ostream &out, const Camera &c ){
+  return(c.write(out));
+}

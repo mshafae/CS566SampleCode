@@ -1,11 +1,5 @@
-/* Your Name Here
- * somebody at something dot TLD
- * CS 484
- * September 20xx
- *
- */
 /*
- * Copyright (c) 2005-2013 Michael Shafae
+ * Copyright (c) 2005-2015 Michael Shafae
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,89 +26,119 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * $Id: Scene.h 4419 2013-09-12 04:16:46Z mshafae $
+ * $Id: Scene.h 5861 2015-06-08 17:46:13Z mshafae $
  *
  */
 
 #include <string>
+#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cassert>
+#include <iterator>
+#include <stdexcept>
+#include <algorithm>
+
+#include <GFXMath.h>
+#include <GFXExtra.h>
 
 #include "Camera.h"
-#include "Image.h"
+#include "Light.h"
 #include "Material.h"
-#include "Group.h"
+#include "ViewPlane.h"
+#include "GeometricObject.h"
 
 #ifndef _SCENE_H_
 #define _SCENE_H_
 
-using namespace std;
-
 class Scene{
 	public:
-		Scene( string inputFilename = "", string outputFilename = "", string depthFilename = "" );
-		~Scene( );
+  Scene( ){ };
+  Scene( std::string &inputFilename );
+	~Scene( );
+  
+	// Accessors
+	Camera& camera( );
+  ViewPlane& viewPlane( );
 
-		// Accessors
-		Camera& camera( );
-		Pixel& backgroundColor( );
-		int numberOfMaterials( );
-		void setCurrentMaterial( int i );
-		Material* currentMaterial( );
-		Group* group( );
-		string& inputSceneFile( );
-		string& outputFile( );
-		string& depthFile( );
-		
-		void setInputSceneFile( string file );
-		void setOutputFile( string file );
-		void setDepthFile( string file );
+	RGBAColor& backgroundColor( );
 
-		bool hasInputSceneFilePath( );
-		bool hasOutputFilePath( );
-		bool hasDepthFilePath( );
+  size_t lightCount( ) const;
+  Light* lightAtIndex(size_t i);
+  
+	size_t materialCount( ) const;
+  Material* materialAtIndex(size_t i);
+  
+  size_t objectCount( ) const;
+  GeometricObject* objectAtIndex(size_t i);
 
-		bool parse( );
+	std::string& inputSceneFile( );
 
-		// I/O
-		void write( std::ostream &out ) const;
+	bool parse( );
 
-	private:
-		string myInputSceneFile;
-		string myOutputFile;
-		string myDepthFile;
-		Camera myCamera;
-		Pixel myBackgroundColor;
-		int myNumberOfMaterials;
-		Material **materials;
-		Material *myCurrentMaterial;
-		Group *myGroup;
-		ifstream inputFileStream;
+	// I/O
+	void write( std::ostream &out ) const;
 
-		// For parsing
-		char currentLine[255];
-		char currentToken[255];
-		int lineNumber;
-		int tokenCount;
-    int length;
-    int i;
-    int j;
-		void nextToken( );
-		void parseCamera( );
-    void parseOrthographicCamera( );
-		void nextOnLine( );
-		bool areMoreTokens( );
-		void advance( );
-		void checkToken( const char *str, const char *stage  );
-		void parseBackground( );
-		float parseFloat( );
-    double parseDouble( );
-		int parseInt( );
-		// Finish these...
-		void parseViewPlane( );
-		void parseMaterials( );
-		void parseGroup( );
+  private:
+	std::string _inputSceneFile;
+	Camera* _camera;
+	ViewPlane _viewPlane;
+	RGBAColor _backgroundColor;
+
+	std::vector<Material*> _materials;
+	size_t _currentMaterialIndex;
+
+  std::vector<Light*> _lights;
+
+	std::vector<GeometricObject*> _objects;
+
+	std::ifstream _inputFileStream;
+
+	// For parsing
+	char _currentLine[255];
+	char _currentToken[255];
+
+	char *_stage;
+	int _lineNumber;
+	int _tokenCount;
+	size_t _length;
+	size_t _i;
+	size_t _j;
+
+
+  void _nextToken( );
+
+  void _checkToken( const char *str );
+  void _advance( );
+  bool _areMoreTokens( );
+  void _nextOnLine( );
+
+
+	void _parseCamera( );
+	void _parseOrthographicCamera( );
+	void _parsePerspectiveCamera( );
+	void _parseSimplePerspectiveCamera( );
+
+  void _parseLights( );
+  void _parsePointLight(uint id);
+  void _parseDirectionalLight(uint id);
+
+	void _parseBackground( );
+
+	void _parseViewPlane( );
+
+	void _parseMaterials( );
+  void _parsePhongMaterial(uint id);
+
+	void _parseGroup( );
+  void _parseMaterialIndex( );
+  void _parseSphere(int i);
+
+  float _parseFloat( );
+  double _parseDouble( );
+  int _parseInt( );
+
 };
 
 std::ostream& operator <<( std::ostream &out, const Scene &s );

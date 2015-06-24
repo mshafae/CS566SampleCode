@@ -1,11 +1,5 @@
-/* Your Name Here
- * somebody at something dot TLD
- * CS 484
- * September 2008
- *
- */
 /*
- * Copyright (c) 2005-2013 Michael Shafae
+ * Copyright (c) 2005-2015 Michael Shafae
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,57 +26,74 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * $Id: raytrace.cpp 4419 2013-09-12 04:16:46Z mshafae $
+ * $Id: raytrace.cpp 5861 2015-06-08 17:46:13Z mshafae $
  *
  */
 
 #include <iostream>
 #include <string>
-#include "getopt.h"
+#include <cstdio>
+#include <cstdlib>
+#include <getopt.h>
+#include <stdexcept>
+#include <StopWatch.h>
 #include "Scene.h"
+#include "RayFactory.h"
+#include "ShadingRecord.h"
+#include "Image.h"
+#include "shader.h"
+ 
+std::string gProgramName;
 
-Scene *gTheScene;
-string gProgramName;
-
-void usage( string message = "" ){
-	cerr << message << endl;
-	cerr << gProgramName << " -i <inputfile> -o <outputfile> -d <depthfile>" << endl;
-	cerr << "          -or-" << endl;
-	cerr << gProgramName << " --input <inputfile> --output <outputfile> --depth <depthfile>" << endl;
+void usage( std::string message = "" ){
+  std::cerr << message << std::endl;
+  std::cerr << gProgramName << " -i <inputfile> -o <outputfile> -d <depthfile>" << std::endl;
+  std::cerr << "          -or-" << std::endl;
+  std::cerr << gProgramName << " --input <inputfile> --output <outputfile> --depth <depthfile>" << std::endl;
 	
 }
 
-void parseCommandLine( int argc, char **argv ){
-	int ch;
-	string inputFile( "" ), outputFile( "" ), depthFile( "" );
-  int resolution;
-	static struct option longopts[] = {
+std::string dirname(std::string path){
+  std::size_t index = path.rfind("/");
+  return path.substr(index+1, path.size( ));
+}
+
+std::string basename(std::string& filename, std::string& extension){
+  std::size_t index = filename.rfind(extension);
+  if( index == std::string::npos ){
+    throw std::range_error("Could not find " + extension + " in string " + filename);
+  }
+  return filename.substr(0, index);
+}
+
+int main( int argc, char **argv ){
+  StopWatch total;
+  total.start( );
+  gProgramName = dirname(std::string(argv[0]));
+  std::string inputFile, outputFile, depthFile;
+  char ch;
+    static struct option longopts[] = {
     { "input", required_argument, NULL, 'i' },
     { "output", required_argument, NULL, 'o' },
     { "depth", required_argument, NULL, 'd' },
-    { "resolution", required_argument, NULL, 'r' },
-    { "verbose", required_argument, NULL, 'v' },
-    { "help", required_argument, NULL, 'h' },
+    { "verbose", no_argument, NULL, 'v' },
+    { "help", no_argument, NULL, 'h' },
     { NULL, 0, NULL, 0 }
-	};
-
-	while( (ch = getopt_long(argc, argv, "i:o:d:r:vh", longopts, NULL)) != -1 ){
+  };
+  while( (ch = getopt_long(argc, argv, "i:o:d:vh", longopts, NULL)) != -1 ){
 		switch( ch ){
 			case 'i':
 				// input file
-				inputFile = string(optarg);
+				inputFile = std::string(optarg);
 				break;
 			case 'o':
 				// image output file
-				outputFile = string(optarg);
+				outputFile = std::string(optarg);
 				break;
 			case 'd':
 				// depth output file
-				depthFile = string( optarg );
+				depthFile = std::string( optarg );
 				break;
-			case 'r':
-        resolution = atoi(optarg);
-        break;
       case 'v':
         // set your flag here.
         break;
@@ -94,25 +105,43 @@ void parseCommandLine( int argc, char **argv ){
 				break;
 		}
 	}
-	gTheScene = new Scene( inputFile, outputFile, depthFile );
-}
-
-int main( int argc, char **argv ){
-	string pathStr;
-	gProgramName = argv[0];
-
-	parseCommandLine( argc, argv );
 	argc -= optind;
 	argv += optind;
-	if( gTheScene->hasInputSceneFilePath( ) &&
-			gTheScene->hasOutputFilePath( ) &&
-			gTheScene->hasDepthFilePath( ) ){
-		gTheScene->parse( );	
-		cout << *gTheScene << endl;	
-	}else{
-		usage( "You specify an input scene file, an output file and a depth file." );
-	}
+  if( inputFile == "" ){
+    usage( "Must provide an input scene file" );
+    exit(1);
+  }
 
+  std::string base;
+  try{
+    std::string ext(".txt");
+    base = basename(inputFile, ext);
+  }
+  catch( std::runtime_error& e ){
+    std::cerr << __LINE__ << " :Exception occurred: " << e.what( ) << std::endl;
+    exit(1);
+  }
+  
+  base = dirname(base);
+  
+  if( outputFile == "" ){
+    outputFile = base + std::string("-output.png");
+    std::cout << "No output file specified, using default: " << outputFile << std::endl;
+  }
+  
+  if( depthFile == "" ){
+    depthFile = base + std::string("-depth.png");
+    std::cout << "No depth file specified, using default: " << depthFile << std::endl;
+  }
 
+  Scene theScene(inputFile);
+
+  theScene.parse();
+#ifndef NDEBUG
+  std::cout << theScene << std::endl;
+#endif
+
+  // Fill me in!
+  
 	return( 0 );
 }

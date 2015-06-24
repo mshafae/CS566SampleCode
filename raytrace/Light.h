@@ -26,27 +26,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * $Id: Material.h 5861 2015-06-08 17:46:13Z mshafae $
+ * $Id: Light.h 5856 2015-06-06 22:48:38Z mshafae $
  *
  */
 
 #include <iostream>
+
 #include <GFXMath.h>
 #include <GFXExtra.h>
- 
-#ifndef _MATERIAL_H_
-#define _MATERIAL_H_
+
+#ifndef _LIGHT_H_
+#define _LIGHT_H_
+
 
 enum{
-  MATERIAL_NULL = 0,
-  MATERIAL_PHONG
+  LIGHT_NULL = 0,
+  LIGHT_PHONG_POINT
 };
 
-class Material{
+class Light{
 public:
-  Material( );
-  Material(const uint id, const uint type);
-  virtual ~Material( );
+  Light(const uint id = 0, const uint type = LIGHT_NULL);
+  virtual ~Light( );
+
+  Light& operator =(const Light& m);
 
   size_t id( ) const {
     return _id;
@@ -56,8 +59,10 @@ public:
     return _type;
   }
   
+  virtual Point3 position( ) const = 0;
+
   virtual std::ostream& write( std::ostream &out ) const {
-    out << "Material (" << _type << ") " << _id << ":" << std::endl;
+    out << "Light (" << _type << ") " << _id << ":" << std::endl;
     return out;
   };
 protected:
@@ -65,48 +70,58 @@ protected:
   uint _type;
 };
 
-class PhongMaterial : public Material{
+class PhongPointLight: public Light{
 public:
-  PhongMaterial( );
-  PhongMaterial(uint id, const RGBAColor& ambient, const RGBAColor& diffuse, const RGBAColor& specular, const float shininess);
+  PhongPointLight( );
 
-  ~PhongMaterial( ){ };
+  PhongPointLight(const uint id, const Point3& position, const RGBAColor& ambient,
+    const RGBAColor& diffuse, const RGBAColor& specular, const float const_atten,
+    const float linear_atten, const float quadratic_atten);
 
-  RGBAColor ambient( ){
+  ~PhongPointLight( );
+
+  Point3 position( ) const{
+    return _position;
+  }
+
+  RGBAColor ambient( ) const{
     return _ambient;
   }
 
-  RGBAColor diffuse( ){
+  RGBAColor diffuse( ) const{
     return _diffuse;
   }
-  
-  RGBAColor specular( ){
+
+  RGBAColor specular( ) const{
     return _specular;
   }
-  
-  float shininess( ){
-    return _shininess;
-  }
+
+  float attenuation(float distance);
   
   std::ostream& write( std::ostream &out ) const {
-    out << "Material (Phong:" << _type << ") " << _id << ":" << std::endl;
-    out << "\tAmbient color: ";
-    _ambient.write_row(out) << std::endl;
-    out << "\tDiffuse color: ";
-    _diffuse.write_row(out) << std::endl;
-    out << "\tSpecular color: ";
-    _specular.write_row(out) << std::endl;
-    out << "\tShininess: " << _shininess << std::endl;
+    out << "PhongPointLight (" << _type << ") " << _id << ":" << std::endl;
+    out << "\tposition: " << _position << std::endl;
+    out << "\tambient color: " << _ambient << std::endl;
+    out << "\tdiffuse color: " << _diffuse << std::endl;
+    out << "\tspecular color: " << _specular << std::endl;
+    out << "\tconstant atten: " << _const_atten << std::endl;
+    out << "\tlinear atten: " << _linear_atten << std::endl;
+    out << "\tquadratic atten: " << _quadratic_atten << std::endl;
     return out;
-
   };
-protected:
+
+
+private:
+  Point3 _position;
   RGBAColor _ambient;
   RGBAColor _diffuse;
   RGBAColor _specular;
-  float _shininess;
+  float _const_atten;
+  float _linear_atten;
+  float _quadratic_atten;
 };
 
-std::ostream& operator <<( std::ostream &out, const Material &m );
+std::ostream& operator <<( std::ostream &out, const Light &l );
 
 #endif
+

@@ -26,87 +26,75 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * $Id: Material.h 5861 2015-06-08 17:46:13Z mshafae $
+ * $Id: GeometricObject.h 5869 2015-06-09 10:02:58Z mshafae $
  *
  */
 
-#include <iostream>
 #include <GFXMath.h>
 #include <GFXExtra.h>
- 
-#ifndef _MATERIAL_H_
-#define _MATERIAL_H_
+
+#include "Material.h"
+#include "ShadingRecord.h"
+
+#ifndef _GEOMETRIC_OBJECT_H_
+#define _GEOMETRIC_OBJECT_H_
 
 enum{
-  MATERIAL_NULL = 0,
-  MATERIAL_PHONG
+  GEOMETRY_NULL = 0,
+  GEOMETRY_SPHERE,
+  GEOMETRY_PLANE,
+  GEOMETRY_TRIANGLE
 };
 
-class Material{
+class GeometricObject{  
 public:
-  Material( );
-  Material(const uint id, const uint type);
-  virtual ~Material( );
-
-  size_t id( ) const {
-    return _id;
-  }
-
-  size_t type( ) const{
-    return _type;
-  }
+  GeometricObject( const uint id, const uint type, Material* material );
   
+  virtual ~GeometricObject( );
+
+  GeometricObject& operator =(const GeometricObject& obj);
+
+  uint id( ) const { return _id;};
+
+  uint type( ) const { return _type;};
+
+  Material* material( ) const { return _material;};
+
+  virtual bool intersect(const Ray& r, const Interval& interval, ShadingRecord& sr) const = 0;
+
   virtual std::ostream& write( std::ostream &out ) const {
-    out << "Material (" << _type << ") " << _id << ":" << std::endl;
+    out << "Geometric Object (" << _type << ") " << _id << ":" << std::endl;
     return out;
   };
 protected:
   uint _id;
   uint _type;
+  Material* _material;
 };
 
-class PhongMaterial : public Material{
+class Sphere : public GeometricObject{
 public:
-  PhongMaterial( );
-  PhongMaterial(uint id, const RGBAColor& ambient, const RGBAColor& diffuse, const RGBAColor& specular, const float shininess);
+  Sphere(const uint id, Material* material, const float radius, const Point3& center);
 
-  ~PhongMaterial( ){ };
+  ~Sphere( );
 
-  RGBAColor ambient( ){
-    return _ambient;
-  }
+  Sphere& operator =(const Sphere& s);
 
-  RGBAColor diffuse( ){
-    return _diffuse;
-  }
-  
-  RGBAColor specular( ){
-    return _specular;
-  }
-  
-  float shininess( ){
-    return _shininess;
-  }
-  
+  bool intersect(const Ray& r, const Interval& interval, ShadingRecord& sr);
+
   std::ostream& write( std::ostream &out ) const {
-    out << "Material (Phong:" << _type << ") " << _id << ":" << std::endl;
-    out << "\tAmbient color: ";
-    _ambient.write_row(out) << std::endl;
-    out << "\tDiffuse color: ";
-    _diffuse.write_row(out) << std::endl;
-    out << "\tSpecular color: ";
-    _specular.write_row(out) << std::endl;
-    out << "\tShininess: " << _shininess << std::endl;
+    out << "Sphere " << _id << ":" << std::endl;
+    out << "\tMaterial: " << material( ) << std::endl;
+    out << "\tRadius: " << _radius << std::endl;
+    out << "\tCenter: ";
+    _center.write_row(out) << std::endl;
     return out;
-
   };
-protected:
-  RGBAColor _ambient;
-  RGBAColor _diffuse;
-  RGBAColor _specular;
-  float _shininess;
+
+private:
+  float _radius;
+  Point3 _center;
 };
 
-std::ostream& operator <<( std::ostream &out, const Material &m );
-
+std::ostream& operator <<( std::ostream &out, const GeometricObject &obj );
 #endif

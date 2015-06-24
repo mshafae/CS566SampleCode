@@ -26,87 +26,84 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * $Id: Material.h 5861 2015-06-08 17:46:13Z mshafae $
+ * $Id: ShadingRecord.h 5861 2015-06-08 17:46:13Z mshafae $
  *
  */
 
-#include <iostream>
 #include <GFXMath.h>
 #include <GFXExtra.h>
+
+#include "Material.h"
  
-#ifndef _MATERIAL_H_
-#define _MATERIAL_H_
+#ifndef _SHADING_RECORD_H_
+#define _SHADING_RECORD_H_
 
-enum{
-  MATERIAL_NULL = 0,
-  MATERIAL_PHONG
-};
-
-class Material{
+class ShadingRecord{
 public:
-  Material( );
-  Material(const uint id, const uint type);
-  virtual ~Material( );
+  ShadingRecord( );
+  ShadingRecord(const bool didhit, const float tValue, const Point3& hitPoint, const Vec3& normal, Material* material);
 
-  size_t id( ) const {
-    return _id;
+  ShadingRecord(const ShadingRecord& sr);
+
+  ShadingRecord& operator =(const ShadingRecord& sr);
+
+  bool didHit( ) const{
+    return _didHit;
   }
 
-  size_t type( ) const{
-    return _type;
-  }
-  
-  virtual std::ostream& write( std::ostream &out ) const {
-    out << "Material (" << _type << ") " << _id << ":" << std::endl;
-    return out;
-  };
-protected:
-  uint _id;
-  uint _type;
-};
-
-class PhongMaterial : public Material{
-public:
-  PhongMaterial( );
-  PhongMaterial(uint id, const RGBAColor& ambient, const RGBAColor& diffuse, const RGBAColor& specular, const float shininess);
-
-  ~PhongMaterial( ){ };
-
-  RGBAColor ambient( ){
-    return _ambient;
+  float tValue( ) const{
+    return _tValue;
   }
 
-  RGBAColor diffuse( ){
-    return _diffuse;
+  Point3 hitPoint( ) const{
+    return _hitPoint;
   }
-  
-  RGBAColor specular( ){
-    return _specular;
+
+  Vec3 normalAtPoint( ) const{
+    return _normal;
+  }
+
+  Material* material( ) const{
+    return _material;
+  }
+
+  void setHit(bool hit){
+    _didHit = hit;
+  }
+
+  void setTValue(const float tValue){
+    _tValue = tValue;
   }
   
-  float shininess( ){
-    return _shininess;
+  void setHitPoint(const Point3& hitPoint){
+    _hitPoint = hitPoint;
   }
-  
+
+  void setNormalAtPoint(const Vec3& normal){
+    _normal = normal;
+  }
+
+  void setMaterial(Material* material){
+    _material = material;
+  }
+
   std::ostream& write( std::ostream &out ) const {
-    out << "Material (Phong:" << _type << ") " << _id << ":" << std::endl;
-    out << "\tAmbient color: ";
-    _ambient.write_row(out) << std::endl;
-    out << "\tDiffuse color: ";
-    _diffuse.write_row(out) << std::endl;
-    out << "\tSpecular color: ";
-    _specular.write_row(out) << std::endl;
-    out << "\tShininess: " << _shininess << std::endl;
+    out << "Shading Record:" << std::endl;
+    out << "\tDid hit?: " << _didHit << std::endl;
+    out << "\tT value: " << _tValue << std::endl;
+    out << "\tHit point: " << _hitPoint << std::endl;
+    out << "\tNormal: " << _normal << std::endl;
+    out << "\tMaterial: " << *_material << std::endl;
     return out;
-
-  };
-protected:
-  RGBAColor _ambient;
-  RGBAColor _diffuse;
-  RGBAColor _specular;
-  float _shininess;
+  }
+private:
+  bool _didHit;
+  float _tValue;
+  Point3 _hitPoint;
+  Vec3 _normal;
+  Material* _material;
 };
 
-std::ostream& operator <<( std::ostream &out, const Material &m );
+std::ostream& operator <<( std::ostream &out, const ShadingRecord &sr );
 
 #endif

@@ -26,63 +26,58 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * $Id: Camera.h 5856 2015-06-06 22:48:38Z mshafae $
+ * $Id: ViewPlane.h 5848 2015-06-02 18:29:30Z mshafae $
  *
  */
 
+#include <cstdlib>
+#include <cmath>
 #include <iostream>
 
-#include <GFXMath.h>
-#include <GFXExtra.h>
+#ifndef _VIEWPLANE_H_
+#define _VIEWPLANE_H_
 
-#ifndef _CAMERA_H_
-#define _CAMERA_H_
-
-enum{
-  CAMERA_NULL = 0,
-  CAMERA_ORTHO,
-  CAMERA_SIMPLE_PERSPECTIVE,
-  CAMERA_PERSPECTIVE
-};
-
-class Camera{
+class ViewPlane{
 public:
-  Camera( ): _type(CAMERA_NULL){ };
-  Camera(uint type, Point3& position, Point3& lookAt, Vec3& up);
-  Camera(const Camera& c);
-
-  virtual ~Camera( ){ };
-
-  virtual Camera& operator =(const Camera& rhs);
+  ViewPlane( );
+  explicit ViewPlane(size_t width, size_t height, double pixelSize, uint sampleCount, float gamma = 1.0);
+  explicit ViewPlane(const ViewPlane &vp);
   
-  Point3 position( ) const;
-  Point3 lookAt( ) const;
-  Vec3 gaze( ) const;
-  Vec3 up( ) const;
-  Vec3 right( ) const;
+  ~ViewPlane( ){ };
+  
+  ViewPlane& operator =(const ViewPlane& vp);
+  
+  uint width( ) const{
+    return _width;
+  }
+  uint height( ) const{
+    return _height;
+  }
+  float pixelSize( ) const{
+    return _pixelSize;
+  }
+  float sampleCount( ) const{
+    return _sampleCount;
+  }
+  float gamma( ) const{
+    return _gamma;
+  }
+  
+  uint pixelWidth( );
 
-  Mat4 lookAtMatrix( ) const;
-    
-  uint type( ) const { return _type; };
-
+  uint pixelHeight( );
+  
   std::ostream& write(std::ostream &out) const;
   
-protected :
-  Point3 _position;
-  Point3 _lookAt;
-  Vec3 _up;
-  uint _type;  
+private:
+  uint _width;
+  uint _height;
+  float _pixelSize;
+  uint _sampleCount;
+  float _gamma;
+  float _invGamma;
 };
 
-// Basic I/O
-std::ostream& operator <<( std::ostream &out, const Camera &c );
-
-class OrthographicCamera : public Camera{
-public:
-  OrthographicCamera(Point3& position, Point3& lookAt, Vec3& up);
-  ~OrthographicCamera( );
-  
-  OrthographicCamera& operator =(const OrthographicCamera& rhs);  
-};
+std::ostream& operator <<( std::ostream &out, const ViewPlane &vp );
 
 #endif

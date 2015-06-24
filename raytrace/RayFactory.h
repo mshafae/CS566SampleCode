@@ -26,63 +26,52 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * $Id: Camera.h 5856 2015-06-06 22:48:38Z mshafae $
+ * $Id: RayFactory.h 5861 2015-06-08 17:46:13Z mshafae $
  *
  */
 
 #include <iostream>
+#include <utility>
 
 #include <GFXMath.h>
 #include <GFXExtra.h>
 
-#ifndef _CAMERA_H_
-#define _CAMERA_H_
+#include "Camera.h"
+#include "ViewPlane.h"
 
-enum{
-  CAMERA_NULL = 0,
-  CAMERA_ORTHO,
-  CAMERA_SIMPLE_PERSPECTIVE,
-  CAMERA_PERSPECTIVE
-};
+#ifndef _RAYFACTORY_H_
+#define _RAYFACTORY_H_
 
-class Camera{
+class RayFactory{
 public:
-  Camera( ): _type(CAMERA_NULL){ };
-  Camera(uint type, Point3& position, Point3& lookAt, Vec3& up);
-  Camera(const Camera& c);
+  RayFactory( );
 
-  virtual ~Camera( ){ };
+  RayFactory(const Camera& c, const ViewPlane& vp);
 
-  virtual Camera& operator =(const Camera& rhs);
-  
-  Point3 position( ) const;
-  Point3 lookAt( ) const;
-  Vec3 gaze( ) const;
-  Vec3 up( ) const;
-  Vec3 right( ) const;
+  ~RayFactory( );
 
-  Mat4 lookAtMatrix( ) const;
-    
-  uint type( ) const { return _type; };
+  Ray next(uint* px, uint* py);
 
-  std::ostream& write(std::ostream &out) const;
-  
-protected :
-  Point3 _position;
-  Point3 _lookAt;
-  Vec3 _up;
-  uint _type;  
+  bool hasMoreRays( );
+
+  std::ostream& write(std::ostream& out) const{
+    out << "RayFactory:" << std::endl;
+    out << "\tRay Count: " << _rayCount << std::endl;
+    out << _camera << std::endl;
+    out << _viewPlane << std::endl;
+    return out;
+  }
+private:
+  Camera _camera;
+  ViewPlane _viewPlane;
+  unsigned long _rayCount;
+  // Fill me in!
 };
 
 // Basic I/O
-std::ostream& operator <<( std::ostream &out, const Camera &c );
-
-class OrthographicCamera : public Camera{
-public:
-  OrthographicCamera(Point3& position, Point3& lookAt, Vec3& up);
-  ~OrthographicCamera( );
-  
-  OrthographicCamera& operator =(const OrthographicCamera& rhs);  
-};
+std::ostream& operator <<( std::ostream &out, const RayFactory &rf ){
+  rf.write(out);
+  return out;
+}
 
 #endif
